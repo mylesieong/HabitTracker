@@ -9,6 +9,17 @@ import android.util.Log;
 import com.myles.udacity.habittracker.data.HabitTrackerContract.HabitEntry;
 import com.myles.udacity.habittracker.data.HabitTrackerDbHelper;
 
+/**
+ * This class contains the project requirement interface methods which are:
+ *   1. void displayCount(HabitTrackerDbHelper, String) : display total count of a given table in default datatbase
+ *   2. void insert(HabitTrackerDbHelper, String, ContentValues): insert data to a given table
+ *   3. void update(HabitTrackerDbHelper, String, ContentValues, String, String[]): update data of a given table with selections
+ *   4. void delete(HabitTrackerDbHelper, String, String, String[]) : delete data from a given table with selections
+ *   5. Cursor read(HabitTrackerDbHelper, String, String[], String, String[], String): read data from a given table with selections and return cursor
+ *   Some of above method output logs to better demonstrate the behavior.
+ *
+ *   While in the onCreate method of the main activity, there are demos actions of above methods.
+ *   */
 public class MainActivity extends AppCompatActivity {
 
     @Override
