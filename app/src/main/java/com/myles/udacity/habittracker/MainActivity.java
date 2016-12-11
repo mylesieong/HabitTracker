@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
         String selectionDelete = HabitEntry.COLUMN_ITEM_NAME + " LIKE ?";
         String[] selectionArgsDelete = {"POOL-SWIMMING"};
         this.delete(habitTrackerDbHelper, HabitEntry.TABLE_NAME, selectionDelete, selectionArgsDelete);
+
+        //delete the whole database
+        habitTrackerDbHelper.deleteDatabase();
     }
 
     private void displayCount(HabitTrackerDbHelper habitTrackerDbHelper, String tableName) {

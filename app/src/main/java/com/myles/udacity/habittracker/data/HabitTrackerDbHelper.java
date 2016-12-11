@@ -9,6 +9,8 @@ import com.myles.udacity.habittracker.data.HabitTrackerContract.HabitEntry;
 
 import org.xml.sax.HandlerBase;
 
+import java.io.File;
+
 /**
  * Created by asus on 11/12/2016.
  */
@@ -40,5 +42,12 @@ public class HabitTrackerDbHelper extends SQLiteOpenHelper {
         String eraseSQL = "DROP TABLE IF EXISTS" + HabitEntry.TABLE_NAME + ";";
         sqLiteDatabase.execSQL(eraseSQL);
         this.onCreate(sqLiteDatabase);
+    }
+
+    public void deleteDatabase(){
+        File file = new File(this.getWritableDatabase().getPath());
+        if (file.exists()){
+            file.delete();
+        }
     }
 }
