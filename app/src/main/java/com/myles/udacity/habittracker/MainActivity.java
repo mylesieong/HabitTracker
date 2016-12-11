@@ -28,11 +28,11 @@ public class MainActivity extends AppCompatActivity {
         //update existing data
         this.update(habitTrackerDbHelper);
 
-        // delete existing data
-        //this.delete(habitTrackerDbHelper);
-
         //read existing data
         this.read(habitTrackerDbHelper);
+
+        // delete existing data
+        this.delete(habitTrackerDbHelper);
     }
 
     private void displayCount(HabitTrackerDbHelper habitTrackerDbHelper) {
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private void delete(HabitTrackerDbHelper habitTrackerDbHelper) {
         SQLiteDatabase db = habitTrackerDbHelper.getWritableDatabase();
         String selection = HabitEntry.COLUMN_ITEM_NAME + " LIKE ?";
-        String[] selectionArgs = {"SWIMMING"};
+        String[] selectionArgs = {"POOL-SWIMMING"};
         db.delete(HabitEntry.TABLE_NAME, selection, selectionArgs);
     }
 
