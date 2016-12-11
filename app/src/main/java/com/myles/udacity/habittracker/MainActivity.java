@@ -20,24 +20,47 @@ public class MainActivity extends AppCompatActivity {
         HabitTrackerDbHelper habitTrackerDbHelper = new HabitTrackerDbHelper(this);
 
         //show total count of database
-        this.displayCount(habitTrackerDbHelper);
+        this.displayCount(habitTrackerDbHelper, HabitEntry.TABLE_NAME);
 
         //insert new row of data
-        this.insert(habitTrackerDbHelper);
+        ContentValues valuesInsert = new ContentValues();
+        valuesInsert.put(HabitEntry.COLUMN_ITEM_NAME, "SWIMMING");
+        valuesInsert.put(HabitEntry.COLUMN_FREQUENCY, 4);
+        valuesInsert.put(HabitEntry.COLUMN_DURATION, 30);
+        valuesInsert.put(HabitEntry.COLUMN_STARTDATE, 20160101);
+        this.insert(habitTrackerDbHelper, HabitEntry.TABLE_NAME, valuesInsert);
 
         //update existing data
-        this.update(habitTrackerDbHelper);
+        ContentValues valuesUpdate = new ContentValues();
+        valuesUpdate.put(HabitEntry.COLUMN_ITEM_NAME, "POOL-SWIMMING");
+        String selectionUpdate = HabitEntry.COLUMN_ITEM_NAME + " LIKE ?";
+        String[] selectionArgsUpdate = {"SWIMMING"};
+        this.update(habitTrackerDbHelper, HabitEntry.TABLE_NAME, valuesUpdate, selectionUpdate, selectionArgsUpdate);
 
         //read existing data
-        this.read(habitTrackerDbHelper);
+        String[] projectionRead = {HabitEntry._ID, HabitEntry.COLUMN_ITEM_NAME, HabitEntry.COLUMN_STARTDATE};
+        String selectionRead = HabitEntry.COLUMN_ITEM_NAME + " = ?";
+        String[] selectionArgsRead = {"POOL-SWIMMING"};
+        String sortOrderRead =HabitEntry.COLUMN_STARTDATE + " DESC";
+        Cursor cursorRead = this.read(habitTrackerDbHelper, HabitEntry.TABLE_NAME, projectionRead, selectionRead, selectionArgsRead, sortOrderRead);
+
+        //iterate all result from cursor
+        try {
+            cursorRead.moveToFirst();
+            Log.v("MylesDebug", "The first record _id:" + cursorRead.getLong(cursorRead.getColumnIndexOrThrow(HabitEntry._ID)));
+        }finally {
+            cursorRead.close();
+        }
 
         // delete existing data
-        this.delete(habitTrackerDbHelper);
+        String selectionDelete = HabitEntry.COLUMN_ITEM_NAME + " LIKE ?";
+        String[] selectionArgsDelete = {"POOL-SWIMMING"};
+        this.delete(habitTrackerDbHelper, HabitEntry.TABLE_NAME, selectionDelete, selectionArgsDelete);
     }
 
-    private void displayCount(HabitTrackerDbHelper habitTrackerDbHelper) {
+    private void displayCount(HabitTrackerDbHelper habitTrackerDbHelper, String tableName) {
         SQLiteDatabase db = habitTrackerDbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + HabitEntry.TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + tableName, null);
         try {
             Log.v("MylesDebug", "Number of rows in pets database table: " + cursor.getCount());
         } finally {
@@ -45,72 +68,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void insert(HabitTrackerDbHelper habitTrackerDbHelper) {
+    private void insert(HabitTrackerDbHelper habitTrackerDbHelper, String tableName, ContentValues values) {
         SQLiteDatabase db = habitTrackerDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(HabitEntry.COLUMN_ITEM_NAME, "SWIMMING");
-        values.put(HabitEntry.COLUMN_FREQUENCY, 4);
-        values.put(HabitEntry.COLUMN_DURATION, 30);
-        values.put(HabitEntry.COLUMN_STARTDATE, 20160101);
-
-        long newRowId = db.insert(HabitEntry.TABLE_NAME, null, values);
+        long newRowId = db.insert(tableName, null, values);
         Log.v("MylesDebug", "The ID of new row inserted:" + newRowId);
     }
 
-    private void update(HabitTrackerDbHelper habitTrackerDbHelper) {
+    private void update(HabitTrackerDbHelper habitTrackerDbHelper, String tableName, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = habitTrackerDbHelper.getReadableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(HabitEntry.COLUMN_ITEM_NAME, "POOL-SWIMMING");
-
-        String selection = HabitEntry.COLUMN_ITEM_NAME + " LIKE ?";
-        String[] selectionArgs = {"SWIMMING"};
-
-        int count = db.update(
-                HabitEntry.TABLE_NAME,
-                values,
-                selection,
-                selectionArgs);
-
+        int count = db.update(tableName, values, selection, selectionArgs);
         Log.v("MylesDebug", "The update result:" + count);
     }
 
-    private void delete(HabitTrackerDbHelper habitTrackerDbHelper) {
+    private void delete(HabitTrackerDbHelper habitTrackerDbHelper, String tableName, String selection, String[] selectionArgs) {
         SQLiteDatabase db = habitTrackerDbHelper.getWritableDatabase();
-        String selection = HabitEntry.COLUMN_ITEM_NAME + " LIKE ?";
-        String[] selectionArgs = {"POOL-SWIMMING"};
-        db.delete(HabitEntry.TABLE_NAME, selection, selectionArgs);
+        db.delete(tableName, selection, selectionArgs);
     }
 
-    private void read(HabitTrackerDbHelper habitTrackerDbHelper) {
-
+    private Cursor read(HabitTrackerDbHelper habitTrackerDbHelper, String tableName, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteDatabase db = habitTrackerDbHelper.getReadableDatabase();
-
-        String[] projection = {
-                HabitEntry._ID,
-                HabitEntry.COLUMN_ITEM_NAME,
-                HabitEntry.COLUMN_STARTDATE
-        };
-
-        String selection = HabitEntry.COLUMN_ITEM_NAME + " = ?";
-        String[] selectionArgs = {"POOL-SWIMMING"};
-
-        String sortOrder =HabitEntry.COLUMN_STARTDATE + " DESC";
-
-        Cursor c = db.query(
-                HabitEntry.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                selection,                                // The columns for the WHERE clause
-                selectionArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
-
-        c.moveToFirst();
-        Log.v("MylesDebug", "The first record _id:"+ c.getLong(c.getColumnIndexOrThrow(HabitEntry._ID)));
-        c.close();
+        Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
+        return c;
 
     }
 
