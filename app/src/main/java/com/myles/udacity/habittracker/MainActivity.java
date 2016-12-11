@@ -22,12 +22,26 @@ public class MainActivity extends AppCompatActivity {
         //show total count of database
         this.displayCount(habitTrackerDbHelper, HabitEntry.TABLE_NAME);
 
-        //insert new row of data
+        //insert new row of data #1
         ContentValues valuesInsert = new ContentValues();
         valuesInsert.put(HabitEntry.COLUMN_ITEM_NAME, "SWIMMING");
         valuesInsert.put(HabitEntry.COLUMN_FREQUENCY, 4);
         valuesInsert.put(HabitEntry.COLUMN_DURATION, 30);
         valuesInsert.put(HabitEntry.COLUMN_STARTDATE, 20160101);
+        this.insert(habitTrackerDbHelper, HabitEntry.TABLE_NAME, valuesInsert);
+
+        //insert new row of data #2
+        valuesInsert.put(HabitEntry.COLUMN_ITEM_NAME, "JOGGING");
+        valuesInsert.put(HabitEntry.COLUMN_FREQUENCY, 3);
+        valuesInsert.put(HabitEntry.COLUMN_DURATION, 60);
+        valuesInsert.put(HabitEntry.COLUMN_STARTDATE, 20160101);
+        this.insert(habitTrackerDbHelper, HabitEntry.TABLE_NAME, valuesInsert);
+
+        //insert new row of data #3
+        valuesInsert.put(HabitEntry.COLUMN_ITEM_NAME, "READING");
+        valuesInsert.put(HabitEntry.COLUMN_FREQUENCY, 7);
+        valuesInsert.put(HabitEntry.COLUMN_DURATION, 60);
+        valuesInsert.put(HabitEntry.COLUMN_STARTDATE, 20100101);
         this.insert(habitTrackerDbHelper, HabitEntry.TABLE_NAME, valuesInsert);
 
         //update existing data
@@ -39,15 +53,26 @@ public class MainActivity extends AppCompatActivity {
 
         //read existing data
         String[] projectionRead = {HabitEntry._ID, HabitEntry.COLUMN_ITEM_NAME, HabitEntry.COLUMN_STARTDATE};
-        String selectionRead = HabitEntry.COLUMN_ITEM_NAME + " = ?";
-        String[] selectionArgsRead = {"POOL-SWIMMING"};
+        String selectionRead = HabitEntry.COLUMN_DURATION + " = ?";
+        String[] selectionArgsRead = {"60"};
         String sortOrderRead =HabitEntry.COLUMN_STARTDATE + " DESC";
         Cursor cursorRead = this.read(habitTrackerDbHelper, HabitEntry.TABLE_NAME, projectionRead, selectionRead, selectionArgsRead, sortOrderRead);
 
         //iterate all result from cursor
         try {
-            cursorRead.moveToFirst();
-            Log.v("MylesDebug", "The first record _id:" + cursorRead.getLong(cursorRead.getColumnIndexOrThrow(HabitEntry._ID)));
+            if (cursorRead.getCount()>0) {
+                cursorRead.moveToFirst();
+                Log.v("MylesDebug", HabitEntry.COLUMN_ITEM_NAME + " | " + HabitEntry.COLUMN_STARTDATE);
+                Log.v("MylesDebug", cursorRead.getString(cursorRead.getColumnIndex(HabitEntry.COLUMN_ITEM_NAME)) + " | "
+                      + cursorRead.getString(cursorRead.getColumnIndex(HabitEntry.COLUMN_STARTDATE))
+                );
+                while (!cursorRead.isLast()) {
+                    cursorRead.moveToNext();
+                    Log.v("MylesDebug", cursorRead.getString(cursorRead.getColumnIndex(HabitEntry.COLUMN_ITEM_NAME)) + " | "
+                            + cursorRead.getString(cursorRead.getColumnIndex(HabitEntry.COLUMN_STARTDATE))
+                    );
+                }
+            }
         }finally {
             cursorRead.close();
         }
